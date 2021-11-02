@@ -1,8 +1,13 @@
 name = "cloudflare-assignment"
-type = "javascript"
+type = "webpack"
 
-account_id = ""
+account_id = "04228e491671260db313dbe0fc6f874c"
 workers_dev = true
 route = ""
 zone_id = ""
 compatibility_date = "2021-11-02"
+
+kv_namespaces = [
+         { binding = "datastore", preview_id = "2cd2d3e310b14ef7a23e692bc9785a97", id = "dc945b606b5241619d365f0f7b4ec326" }
+]
+
