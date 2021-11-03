@@ -1,5 +1,7 @@
 import { Router } from 'itty-router'
 
+
+
 const router = Router()
 
 router.get("/", () => {
@@ -7,36 +9,24 @@ router.get("/", () => {
 })
 
 router.get("/posts", async () => {
-  const key = await datastore.get("user")
-  console.log(key)
+  var posts = []
+  const keys = await datastore.list()
+  console.log(keys.keys)
+  for (let key of keys.keys) {
+    console.log(key.name)
+    posts.push(await datastore.get(key.name))
+  }
+  console.log(posts)
   //const keys = await datastore.list()
-  //await datastore.put("user", JSON.stringify({"key1" : "val1", "key2" : "val2"}))
-  return new Response(key)
+  //await datastore.put("post1", JSON.stringify({"title" : "first post on this site!!", "content" : "this is my first post..pretty boring"}))
+  return new Response(posts)
 })
 
 /*
-This route demonstrates path parameters, allowing you to extract fragments from the request
-URL.
-Try visit /example/hello and see the response.
-*/
-router.get("/example/:text", ({ params }) => {
-  // Decode text like "Hello%20world" into "Hello world"
-  let input = decodeURIComponent(params.text)
-
-  return new Response(``, {
-    headers: {
-      "Content-Type": "text/html"
-    }
-  })
-})
-
-/*
-This shows a different HTTP method, a POST.
-Try send a POST request using curl or another tool.
 Try the below curl command to send JSON:
 $ curl -X POST <worker> -H "Content-Type: application/json" -d '{"abc": "def"}'
 */
-router.post("/post", async request => {
+router.post("/posts", async request => {
   // Create a base object with some fields.
   let fields = {
     "asn": request.cf.asn,
@@ -59,6 +49,23 @@ router.post("/post", async request => {
 })
 
 /*
+This route demonstrates path parameters, allowing you to extract fragments from the request
+URL.
+Try visit /example/hello and see the response.
+*/
+router.get("/example/:text", ({ params }) => {
+  // Decode text like "Hello%20world" into "Hello world"
+  let input = decodeURIComponent(params.text)
+
+  return new Response(``, {
+    headers: {
+      "Content-Type": "text/html"
+    }
+  })
+})
+
+
+/*
 Render 404 for all other (unknown) routes
 */
 router.all("*", () => new Response("404, not found!", { status: 404 }))
@@ -70,3 +77,12 @@ addEventListener('fetch', (e) => {
   e.respondWith(router.handle(e.request))
 })
 
+
+// const mf = new Miniflare({
+//   script: `
+//   addEventListener("fetch", (event) => {
+//     event.respondWith(router.handle(event.request));
+//   });
+//   `,
+// });
+// const res = await mf.dispatchFetch("http://localhost:8787/");

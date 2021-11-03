@@ -1,5 +1,5 @@
 name = "cloudflare-assignment"
-type = "webpack"
+type = "javascript"
 
 account_id = "04228e491671260db313dbe0fc6f874c"
 workers_dev = true
@@ -10,4 +10,9 @@ compatibility_date = "2021-11-02"
 kv_namespaces = [
          { binding = "datastore", preview_id = "2cd2d3e310b14ef7a23e692bc9785a97", id = "dc945b606b5241619d365f0f7b4ec326" }
 ]
+
+[build]
+command = "npm run build"
+[build.upload]
+format = "service-worker"
 
