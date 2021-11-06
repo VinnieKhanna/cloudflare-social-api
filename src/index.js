@@ -13,8 +13,8 @@ router.get("/posts", async () => {
   const keys = await datastore.list()
   console.log(keys.keys)
   for (let key of keys.keys) {
-    console.log(key.name)
-    posts.push(await datastore.get(key.name))
+    let post = await datastore.get(key.name)
+    posts.push(post)
   }
   console.log(posts)
   //const keys = await datastore.list()
@@ -27,25 +27,24 @@ Try the below curl command to send JSON:
 $ curl -X POST <worker> -H "Content-Type: application/json" -d '{"abc": "def"}'
 */
 router.post("/posts", async request => {
-  // Create a base object with some fields.
-  let fields = {
-    "asn": request.cf.asn,
-    "colo": request.cf.colo
+  //check if json is well-formed
+  let body = await request.json();
+  if (request.headers.get("Content-Type") != "application/json" ||
+      !("username" in body) || !("title" in body) || !("content" in body) || Object.keys(body).length != 3) {
+    return new Response("400, bad request! Only valid json input allowed.", {status: 400})
   }
+  let timestamp = new Date().valueOf()
+  let uniqueKey = body.username + "-" + timestamp;
+  console.log(uniqueKey);
+  await datastore.put(uniqueKey, JSON.stringify(body))
 
-  // If the POST data is JSON then attach it to our response.
-  if (request.headers.get("Content-Type") === "application/json") {
-    fields["json"] = await request.json()
-  }
+  // let fields = {}
+  // // If the POST data is JSON then attach it to our response.
+  // if (request.headers.get("Content-Type") === "application/json") {
+  //   fields["json"] = await request.json()
+  // }
 
-  // Serialise the JSON to a string.
-  const returnData = JSON.stringify(fields, null, 2);
-
-  return new Response(returnData, {
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
+  return new Response() //200 ok
 })
 
 /*
